@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "444955114792",
+    "project_id": "peaksource-manager",
+    "storage_bucket": "peaksource-manager.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:444955114792:android:d16b695ebd8aad1f7ae41d",
+        "android_client_info": {
+          "package_name": "com.peaksource.manager"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBcob4g3vBbLF3KBJbUFdeMRmhud9rAgZw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
