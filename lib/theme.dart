@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-
+const Color backColor = Color(0xFFf3f6ff);
+const Color royalBlue = Color(0xff345afb) ;
+const Color   royalGray = Color(0xff88888a); 
+const Color whiteSmoke = Color(0xfff3f3f5);
 class AppThemes {
-  static const Color primaryColor = Colors.red;
 
   static ThemeData lightTheme = ThemeData(
     brightness: Brightness.light,
-    primaryColor: primaryColor,
+    useMaterial3: true,
+   primaryColor:royalBlue,
     scaffoldBackgroundColor: Colors.white,
     appBarTheme: AppBarTheme(
-      backgroundColor: primaryColor,
+      backgroundColor:royalBlue,
       titleTextStyle: GoogleFonts.poppins(
         fontSize: 20,
         fontWeight: FontWeight.bold,
@@ -24,7 +27,7 @@ class AppThemes {
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
-        backgroundColor: primaryColor,
+        backgroundColor:royalBlue,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),
         ),
@@ -43,10 +46,10 @@ class AppThemes {
 
   static ThemeData darkTheme = ThemeData(
     brightness: Brightness.dark,
-    primaryColor: primaryColor,
+   primaryColor:royalBlue,
     scaffoldBackgroundColor: Colors.black,
     appBarTheme: AppBarTheme(
-      backgroundColor: primaryColor,
+      backgroundColor:royalBlue,
       titleTextStyle: GoogleFonts.poppins(
         fontSize: 20,
         fontWeight: FontWeight.bold,
@@ -61,7 +64,7 @@ class AppThemes {
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
-        backgroundColor: primaryColor,
+        backgroundColor:royalBlue,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),
         ),
@@ -85,11 +88,42 @@ class AppThemes {
   static const Color background2 = Color(0xFF17203A);
  
 }
- TextStyle get lightGray20 {
+ TextStyle get lightGray10 {
+  return GoogleFonts.poppins(
+      textStyle: const TextStyle(
+    fontSize: 10,
+    color: Colors.black54,
+    fontWeight: FontWeight.w500,
+  ));
+}
+ TextStyle get lightGray16 {
+  return GoogleFonts.poppins(
+      textStyle: const TextStyle(
+    fontSize: 18,
+    color: Colors.black54,
+    fontWeight: FontWeight.w500,
+  ));
+}
+ TextStyle get buttonText {
+  return GoogleFonts.poppins(
+      textStyle: const TextStyle(
+    fontSize: 18,
+    color: Colors.white ,   fontWeight: FontWeight.w600,
+  ));
+}
+
+ TextStyle get boldTitle {
   return GoogleFonts.poppins(
       textStyle: const TextStyle(
     fontSize: 20,
-    color: Colors.black38,
-    fontWeight: FontWeight.w400,
+    color : Colors.black ,   fontWeight: FontWeight.w600,
   ));
 }
+TextStyle get boldText {
+  return GoogleFonts.poppins(
+      textStyle: const TextStyle(
+    fontSize: 14,
+    color : Colors.black ,   fontWeight: FontWeight.w600,
+  ));
+}
+

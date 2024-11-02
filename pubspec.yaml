@@ -53,6 +53,9 @@ dependencies:
   glassmorphism_ui: ^0.3.0
   firebase_core: ^3.6.0
   google_sign_in: ^6.2.1
+  iconsax: ^0.0.8
+  simple_gesture_detector: ^0.2.1
+  shared_preferences: ^2.3.2
 
 
 

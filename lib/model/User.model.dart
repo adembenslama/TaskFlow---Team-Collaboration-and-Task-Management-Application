@@ -7,12 +7,14 @@ class UserModel {
   String uid;
   String lastName;
   String pfp;
+  List workspace  = [] ; 
 
   UserModel({
     required this.uid,
     required this.firstName,
     required this.lastName,
     required this.pfp,
+    required this.workspace
   });
   factory UserModel.fromJson(DocumentSnapshot json) {
     return UserModel(
@@ -21,6 +23,8 @@ class UserModel {
       lastName: json["lastName"],
       pfp:
          json["pfp"],
+      workspace: json["workspaces"]
+      
     );
   }
 }

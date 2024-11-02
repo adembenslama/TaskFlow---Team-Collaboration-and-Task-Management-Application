@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:manager/controllers/WorkspaceController.dart';
 import 'package:manager/model/User.model.dart';
 import 'package:manager/views/Auth/SignUpPage.dart';
 import 'package:manager/views/HomePage.dart';
@@ -14,7 +15,7 @@ class AuthController extends GetxController {
   late Rx<User?> _user;
   RxBool isLoading = true.obs;
   Rx<UserModel> userData = UserModel(
-          uid: "", firstName: "firstName", lastName: "lastName", pfp: "pfp")
+          uid: "", firstName: "firstName", lastName: "lastName", pfp: "pfp" , workspace: [])
       .obs;
   getIsLoading() => isLoading.value;
   getUserData() => userData;
@@ -28,6 +29,11 @@ class AuthController extends GetxController {
     _user = Rx<User?>(_auth.currentUser);
     _user.bindStream(_auth.authStateChanges());
     ever(_user, _initialScreen);
+    ever(userData, (_) {
+      if (userData.value.workspace.isNotEmpty) {
+        WorkSpaceController.instance.fetchWorkspaces(userData.value.workspace);
+      }
+    });
   }
 
   _initialScreen(User? user) {
@@ -133,9 +139,10 @@ class AuthController extends GetxController {
       // Handle the error accordingly
     } finally {
       isLoading(false);
-    }
+    } 
     print("pexara0505000000000000000000000000000000000000000000000000000");
     print(userData.value);
+    isLoading(false);
   }
 
 /////////////////////////////
