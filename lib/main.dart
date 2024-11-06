@@ -4,7 +4,15 @@ import 'package:manager/cotroller-bindings.dart';
 import 'package:manager/firebase_options.dart';
 import 'package:manager/theme.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:manager/views/Auth/SignInPage.dart';
 import 'package:manager/views/Auth/SignUpPage.dart';
+import 'package:get/get.dart';
+import 'package:manager/views/NavPage.dart';
+import 'package:manager/views/tasks/TasksPage.dart';
+import 'package:manager/views/feed/FeedPage.dart';
+import 'package:manager/views/profile/profilePage.dart';
+import 'package:manager/views/chat/ChatPage.dart';
+import 'package:manager/views/schedule/CalendarView.dart';
 
 Future<void> main() async {
    WidgetsFlutterBinding.ensureInitialized();
@@ -29,6 +37,15 @@ class MyApp extends StatelessWidget {
       darkTheme: AppThemes.darkTheme,
       themeMode: ThemeMode.system, // Automatically switch between light and dark mode
       home: SignUpPage(),
+      getPages: [
+        GetPage(name: '/', page: () => const SignInPage()),
+        GetPage(name: '/home', page: () => NavigationPage()),
+        GetPage(name: '/calendar', page: () => CalendarScreen()),
+        GetPage(name: '/chat', page: () => ChatPage()),
+        GetPage(name: '/tasks', page: () => const TasksPage()),
+      
+        GetPage(name: '/profile', page: () => ProfilePage()),
+      ],
     );
   }
 }

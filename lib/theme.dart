@@ -127,3 +127,21 @@ TextStyle get boldText {
   ));
 }
 
+
+ TextStyle get lightGray14 {
+  return GoogleFonts.poppins(
+      textStyle: const TextStyle(
+    fontSize: 16,
+    color: Colors.black54,
+    fontWeight: FontWeight.w500,
+  ));
+}
+
+ TextStyle get addStyle {
+  return GoogleFonts.poppins(
+      textStyle: const TextStyle(
+    fontSize: 16,
+    color: Colors.black54,
+    fontWeight: FontWeight.w600,
+  ));
+}

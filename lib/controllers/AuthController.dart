@@ -15,13 +15,16 @@ class AuthController extends GetxController {
   late Rx<User?> _user;
   RxBool isLoading = true.obs;
   Rx<UserModel> userData = UserModel(
-          uid: "", firstName: "firstName", lastName: "lastName", pfp: "pfp" , workspace: [])
+          uid: "", firstName: "firstName",mail: "mail", lastName: "lastName", pfp: "pfp" , workspace: [])
       .obs;
   getIsLoading() => isLoading.value;
   getUserData() => userData;
   getUser() => _user.value;
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn(); 
+
+       final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
   /////////////////////////////////////////////////////
   @override
   void onReady() {
@@ -61,9 +64,21 @@ class AuthController extends GetxController {
                 'firstName': firstName,
                 'lastName': lastName,
                 'email': email,
+                'mail' : email,
                 'pfp':
                     "https://firebasestorage.googleapis.com/v0/b/chatapp-c641c.appspot.com/o/empty.jpg?alt=media&token=2f74e6a7-683e-416b-8e19-a0e2cadad40e"
+                    ,
+                    'workspaces' : [value.user!.uid]
               }));
+         await _firestore.collection('workspaces').doc(instance.userData.value.uid).set({
+          "name" :"personal" ,
+
+        });
+
+        await _firestore.collection('workspaces').doc(instance.userData.value.uid).collection('users').doc(instance.userData.value.uid).set({
+            "EnterDate" : DateTime.now() , 
+            "role" : "admin"
+        });
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
         Get.snackbar(
@@ -148,6 +163,8 @@ class AuthController extends GetxController {
 /////////////////////////////
   void signOut() { _auth.signOut();
   _googleSignIn.signOut();
+  WorkSpaceController.instance.workspaces.clear(); 
+  userData.value = UserModel(uid: "uid", mail : " " ,firstName: "firstName", lastName: "lastName", pfp: "pfp", workspace: []);
   }
 
 

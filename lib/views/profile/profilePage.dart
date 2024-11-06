@@ -5,6 +5,7 @@ import 'package:iconsax/iconsax.dart';
 import 'package:manager/controllers/AuthController.dart';
 import 'package:manager/model/User.model.dart';
 import 'package:manager/theme.dart';
+import 'package:manager/views/profile/EditProfilePage.dart';
 
 class ProfilePage extends StatelessWidget {
   final AuthController _authController = AuthController.instance;
@@ -49,7 +50,7 @@ class ProfilePage extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  '${user.firstName} ${user.workspace[0]}',
+                  '${user.firstName} ${user.lastName}',
                   style: const TextStyle(
                       fontSize: 24, fontWeight: FontWeight.bold),
                 ),
@@ -72,39 +73,25 @@ class ProfilePage extends StatelessWidget {
                     children: [
                       CsutomProfileButton(
                         label: "Edit Profile",
-                        onTap: () {},
-                        icon: Icon(Iconsax.user_edit ),
+                        onTap: () {Get.to(()=>const EditProfilePage());},
+                        icon: const Icon(Iconsax.user_edit ),
                       ),
                       CsutomProfileButton(
-                        label: "label",
+                        label: "Notification Settings",
                         onTap: () {},
-                         icon: Icon(Iconsax.user_edit),
+                         icon: const Icon(Iconsax.notification_bing),
                       ),
                       CsutomProfileButton(
-                        label: "label",
+                        label: "Contact Us",
                         onTap: () {},
-                         icon: Icon(Iconsax.user_edit),
-                      ),
-                      CsutomProfileButton(
-                        label: "label",
+                         icon: const Icon(Iconsax.people),
+                      ), CsutomProfileButton(
+                        label: "Help & FAQ's",
                         onTap: () {},
-                         icon: Icon(Iconsax.user_edit),
+                         icon: const Icon(Icons.question_answer_outlined),
                       ),
-                      CsutomProfileButton(
-                        label: "label",
-                        onTap: () {},
-                         icon: Icon(Iconsax.user_edit),
-                      ),
-                      CsutomProfileButton(
-                        label: "label",
-                        onTap: () {},
-                         icon: Icon(Iconsax.user_edit),
-                      ),
-                      CsutomProfileButton(
-                        label: "label",
-                        onTap: () {},
-                         icon: Icon(Iconsax.user_edit),
-                      ),
+               
+                    
                     ],
                   ),
                 ),
@@ -118,7 +105,7 @@ class ProfilePage extends StatelessWidget {
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(10)),
                     child: ElevatedButton.icon(
-                      icon: Icon(Iconsax.logout , color: Colors.red,),
+                      icon: const Icon(Iconsax.logout , color: Colors.red,),
                       onPressed: () {
                         AuthController().signOut();
                       },

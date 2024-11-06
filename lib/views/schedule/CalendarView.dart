@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:iconsax/iconsax.dart';
 import 'package:manager/theme.dart';
+import 'package:manager/views/schedule/AddTask.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:simple_gesture_detector/simple_gesture_detector.dart';
 
@@ -11,7 +14,6 @@ class CalendarScreen extends StatefulWidget {
 
 class _CalendarScreenState extends State<CalendarScreen> {
   late DateTime _focusedDay;
-  DateTime _selectedDate = DateTime.now();
   CalendarFormat format = CalendarFormat.month;
   late DateTime _selectedDay;
 
@@ -54,10 +56,18 @@ class _CalendarScreenState extends State<CalendarScreen> {
     return Scaffold(
       backgroundColor: backColor,
       appBar: AppBar(
-        title: Text('Calendar', style: boldTitle,),
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+           const SizedBox(width: 20,), 
+            Text('Calendar', style: boldTitle,),
+            IconButton(onPressed: (){ Get.to(const AddTask());}, icon:const Icon(Iconsax.calendar_add , color: royalBlue,))
+          ],
+        ),
         centerTitle: true,
         backgroundColor: backColor,
         elevation: 0,
+        
         scrolledUnderElevation: 0,
       ),
       body: Column(
@@ -104,7 +114,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                     setState(() {
                       _selectedDay = selectedDay;
                       _focusedDay = focusedDay;
-                      _selectedDate = selectedDay; // Update _selectedDate here
+// Update _selectedDate here
                     });
                   },
                   availableGestures: AvailableGestures.all,
@@ -120,7 +130,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                     ),
                     markerDecoration: BoxDecoration(
                       color: Colors.red,
-                      shape: BoxShape.rectangle,
+                      shape: BoxShape.circle,
                     ),
                   ),
                 ),
