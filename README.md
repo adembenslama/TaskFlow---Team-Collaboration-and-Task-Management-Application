@@ -17,7 +17,6 @@ TaskFlow is a comprehensive team collaboration and task management application b
 - Team member management
 - Collaborative workspace environment
 
-### Calendar Integration
 ### Real-time Chat
 - Workspace-specific channels
 - Direct messaging
@@ -38,7 +37,7 @@ TaskFlow is a comprehensive team collaboration and task management application b
 - **State Management**: GetX
 - **Architecture**: MVC Architecture
 
-## Project Structure
+
 
 ## Getting Started
 
