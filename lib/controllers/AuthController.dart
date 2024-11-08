@@ -10,6 +10,8 @@ import 'package:manager/model/User.model.dart';
 import 'package:manager/views/Auth/SignUpPage.dart';
 import 'package:manager/views/HomePage.dart';
 import 'package:manager/views/NavPage.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+
 class AuthController extends GetxController {
   static AuthController instance = Get.find();
   late Rx<User?> _user;
@@ -206,7 +208,7 @@ class AuthController extends GetxController {
   }
 }
 
-void updateUserProfile(String firstName, String lastName, String pfpUrl) async {
+Future<void> updateUserProfile(String firstName, String lastName, String pfpUrl) async {
   try {
     await FirebaseFirestore.instance
         .collection('users')
@@ -387,4 +389,29 @@ bool isEmailVerified() {
 
   /// Sign out (for both Google and Firebase Auth)
  
+
+  Future<void> saveFCMToken(String token) async {
+    try {
+      await _firestore
+          .collection('users')
+          .doc(userData.value.uid)
+          .update({'fcmToken': token});
+    } catch (e) {
+      print('Error saving FCM token: $e');
+    }
+  }
+
+  Future<void> signIn(String email, String password) async {
+    try {
+      // ... existing sign in code ...
+
+      // Get and save FCM token after successful sign in
+      final fcmToken = await FirebaseMessaging.instance.getToken();
+      if (fcmToken != null) {
+        await saveFCMToken(fcmToken);
+      }
+    } catch (e) {
+      // ... error handling ...
+    }
+  }
 }

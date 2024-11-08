@@ -18,7 +18,13 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final AuthController _authController = AuthController.instance;
   final WorkSpaceController _workspace = WorkSpaceController.instance;
-  final TextEditingController _emailController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    // Initial data fetch
+    _workspace.fetchWorkspaceData();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +32,7 @@ class _HomePageState extends State<HomePage> {
       backgroundColor: backColor,
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(kToolbarHeight),
-        child: AppBar(
+        child: Obx(() => AppBar(
           backgroundColor: Colors.transparent,
           title: Row(
             children: [
@@ -60,70 +66,76 @@ class _HomePageState extends State<HomePage> {
               onPressed: () => Scaffold.of(context).openDrawer(),
             ),
           ),
-        ),
+        )),
       ),
       drawer: const MyDrawer(),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                "Workspace Members",
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
+      body: Obx(() {
+        if (_workspace.isLoading.value) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        
+        return SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  "Workspace Members",
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 16),
-              MembersWidget(
-                users: _workspace.getUsers,
-                stacked: true,
-                canAdd: true,
-              ),
-              const SizedBox(height: 24),
-              const Text(
-                "Quick Actions",
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
+                const SizedBox(height: 16),
+                MembersWidget(
+                  users: _workspace.getUsers,
+                  stacked: true,
+                  canAdd: true,
                 ),
-              ),
-              const SizedBox(height: 16),
-              GridView.count(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                crossAxisCount: 2,
-                mainAxisSpacing: 16,
-                crossAxisSpacing: 16,
-                children: [
-                  _buildQuickActionCard(
-                    icon: Iconsax.calendar_1,
-                    title: "Schedule",
-                    onTap: () => Get.toNamed('/calendar'),
+                const SizedBox(height: 24),
+                const Text(
+                  "Quick Actions",
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
                   ),
-                  _buildQuickActionCard(
-                    icon: Iconsax.message,
-                    title: "Chat",
-                    onTap: () => Get.toNamed('/chat'),
-                  ),
-                  _buildQuickActionCard(
-                    icon: Iconsax.task_square,
-                    title: "Tasks",
-                    onTap: () => Get.toNamed('/tasks'),
-                  ),
-                  _buildQuickActionCard(
-                    icon: Iconsax.document,
-                    title: "Files",
-                    onTap: () => Get.toNamed('/files'),
-                  ),
-                ],
-              ),
-            ],
+                ),
+                const SizedBox(height: 16),
+                GridView.count(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  crossAxisCount: 2,
+                  mainAxisSpacing: 16,
+                  crossAxisSpacing: 16,
+                  children: [
+                    _buildQuickActionCard(
+                      icon: Iconsax.calendar_1,
+                      title: "Schedule",
+                      onTap: () => Get.toNamed('/calendar'),
+                    ),
+                    _buildQuickActionCard(
+                      icon: Iconsax.message,
+                      title: "Chat",
+                      onTap: () => Get.toNamed('/chat'),
+                    ),
+                    _buildQuickActionCard(
+                      icon: Iconsax.task_square,
+                      title: "Tasks",
+                      onTap: () => Get.toNamed('/tasks'),
+                    ),
+                    _buildQuickActionCard(
+                      icon: Iconsax.document,
+                      title: "Files",
+                      onTap: () => Get.toNamed('/files'),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
-        ),
-      ),
+        );
+      }),
     );
   }
 

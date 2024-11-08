@@ -6,11 +6,9 @@ class event {
   final String title;
   final String startTime;
   final String endTime;
-  final String note;
   final int color;
   final String userUid;
   final String id;
-  final String access;
 
   event(
       {required this.date,
@@ -18,10 +16,8 @@ class event {
       required this.title,
       required this.startTime,
       required this.endTime,
-      required this.note,
       required this.userUid,
       required this.color,
-      required this.access
       //
       });
 }

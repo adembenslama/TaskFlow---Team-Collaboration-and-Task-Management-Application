@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import 'package:manager/controllers/AuthController.dart';
+import 'package:manager/controllers/ChatController.dart';
 import 'package:manager/model/User.model.dart';
 import 'package:manager/model/workspace.dart';
 
@@ -230,5 +231,37 @@ class WorkSpaceController extends GetxController {
     } finally {
       isLoadingUsers(false);
     }
+  }
+  // Update the selectedWorkspace setter
+  setselectedWorkSpace(Workspace value) {
+    selectedWorkSpace.value = value;
+    fetchWorkspaceData();
+  }
+
+  // Add method to fetch all workspace data
+  Future<void> fetchWorkspaceData() async {
+    try {
+      isLoading(true);
+      // Fetch workspace members
+      await getUsersData(selectedWorkSpace.value.members);
+      
+      // Fetch workspace channels
+      final chatController = Get.find<ChatController>();
+      await chatController.fetchChannels(selectedWorkSpace.value.uid);
+      
+      // Add other workspace data fetching here
+      
+    } catch (e) {
+      print('Error fetching workspace data: $e');
+      Get.snackbar('Error', 'Failed to fetch workspace data');
+    } finally {
+      isLoading(false);
+    }
+  }
+
+  // Update your existing workspace selection method
+  void selectWorkspace(Workspace workspace) {
+    selectedWorkSpace.value = workspace;
+    fetchWorkspaceData();
   }
 }

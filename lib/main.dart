@@ -13,12 +13,19 @@ import 'package:manager/views/feed/FeedPage.dart';
 import 'package:manager/views/profile/profilePage.dart';
 import 'package:manager/views/chat/ChatPage.dart';
 import 'package:manager/views/schedule/CalendarView.dart';
+import 'package:manager/services/notification_service.dart';
 
 Future<void> main() async {
    WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  // Initialize notification service
+  final notificationService = NotificationService();
+  await notificationService.init();
+  Get.put(notificationService);
+
   runApp(const MyApp());
 }
 

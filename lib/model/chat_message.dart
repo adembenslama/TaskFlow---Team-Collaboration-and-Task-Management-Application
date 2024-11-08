@@ -1,14 +1,14 @@
- import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ChatMessage {
   final String id;
   final String content;
   final String senderId;
-  final DateTime timestamp;
+  final int timestamp;
   final String? replyTo;
   final String type;
-  final bool? edited;
-  final DateTime? editedAt;
+  final bool edited;
+  final int? editedAt;
 
   ChatMessage({
     required this.id,
@@ -16,8 +16,8 @@ class ChatMessage {
     required this.senderId,
     required this.timestamp,
     this.replyTo,
-    required this.type,
-    this.edited,
+    this.type = 'text',
+    this.edited = false,
     this.editedAt,
   });
 
@@ -27,23 +27,21 @@ class ChatMessage {
       id: doc.id,
       content: data['content'] ?? '',
       senderId: data['senderId'] ?? '',
-      timestamp: (data['timestamp'] as Timestamp).toDate(),
+      timestamp: data['timestamp']?.millisecondsSinceEpoch ?? 0,
       replyTo: data['replyTo'],
       type: data['type'] ?? 'text',
-      edited: data['edited'],
-      editedAt: data['editedAt'] != null 
-          ? (data['editedAt'] as Timestamp).toDate()
-          : null,
+      edited: data['edited'] ?? false,
+      editedAt: data['editedAt']?.millisecondsSinceEpoch,
     );
   }
 
   Map<String, dynamic> toJson() => {
     'content': content,
     'senderId': senderId,
-    'timestamp': Timestamp.fromDate(timestamp),
+    'timestamp': Timestamp.fromMillisecondsSinceEpoch(timestamp),
     'replyTo': replyTo,
     'type': type,
     'edited': edited,
-    'editedAt': editedAt != null ? Timestamp.fromDate(editedAt!) : null,
+    'editedAt': editedAt != null ? Timestamp.fromMillisecondsSinceEpoch(editedAt!) : null,
   };
 }

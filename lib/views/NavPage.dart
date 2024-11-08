@@ -4,6 +4,7 @@ import 'package:iconsax/iconsax.dart';
 import 'package:manager/controllers/BottomNavController.dart';
 import 'package:manager/theme.dart';
 import 'package:manager/views/HomePage.dart';
+import 'package:manager/views/chat/ChannelsPage.dart';
 import 'package:manager/views/chat/ChatPage.dart';
 import 'package:manager/views/profile/profilePage.dart';
 import 'package:manager/views/schedule/CalendarView.dart';
@@ -19,7 +20,7 @@ class NavigationPage extends StatelessWidget {
     const HomePage(),
     CalendarScreen(),
     const TasksPage(),
-    ChatPage(),
+    ChannelsPage(),
     const FeedPage(),
     ProfilePage(),
   ];

@@ -6,33 +6,57 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:manager/controllers/AuthController.dart';
 
-class FileController extends GetxController{
-    CollectionReference users = FirebaseFirestore.instance.collection('users');
- Rx<PickedFile?> _image  = Rx<PickedFile?>(null);
+class FileController extends GetxController {
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseStorage _storage = FirebaseStorage.instance;
+  final AuthController _auth = AuthController.instance;
+  
+  final RxBool isLoading = false.obs;
+  final Rx<String?> selectedFileUrl = Rx<String?>(null);
 
-  UploadTask? uploadTask;
-  final AuthController _auth = AuthController.instance; 
-  void selectFile() async {
-    var image = await ImagePicker.platform
-        .pickImage(source: ImageSource.gallery, imageQuality: 50);
+  Future<void> selectAndUploadImage() async {
+    try {
+      isLoading(true);
+      
+      // Pick image
+      final ImagePicker picker = ImagePicker();
+      final XFile? image = await picker.pickImage(
+        source: ImageSource.gallery,
+        imageQuality: 50,
+      );
 
-      _image.value = image;
-   
+      if (image == null) return;
 
-    uploadFile();
-  }
+      // Upload image
+      final path = 'profiles/${_auth.userData.value.uid}/${DateTime.now().millisecondsSinceEpoch}';
+      final file = File(image.path);
+      final ref = _storage.ref().child(path);
+      
+      // Upload and get URL
+      final uploadTask = ref.putFile(file);
+      final snapshot = await uploadTask.whenComplete(() {});
+      final urlDownload = await snapshot.ref.getDownloadURL();
+      
+      // Update user profile
+      await _firestore
+          .collection('users')
+          .doc(_auth.userData.value.uid)
+          .update({'pfp': urlDownload});
 
-  Future uploadFile() async {
-    final path = 'files/${_auth.userData.value.uid}';
+      // Update local state
+      selectedFileUrl.value = urlDownload;
+      _auth.userData.update((user) {
+        if (user != null) {
+          user.pfp = urlDownload;
+        }
+      });
 
-    final file = File(_image.value!.path);
-    final ref = FirebaseStorage.instance.ref().child(path);
-    uploadTask = ref.putFile(file);
-    final snapshot = await uploadTask!.whenComplete(() {});
-    final urlDownload = await snapshot.ref.getDownloadURL();
-    await users.doc(_auth.userData.value.uid).update({'pfp': urlDownload});
-
-      _auth.userData.value.pfp = urlDownload;
-
+      Get.snackbar('Success', 'Profile picture updated successfully');
+    } catch (e) {
+      print('Error uploading image: $e');
+      Get.snackbar('Error', 'Failed to update profile picture');
+    } finally {
+      isLoading(false);
+    }
   }
 }

@@ -5,6 +5,10 @@ import 'package:manager/theme.dart';
 import 'package:intl/intl.dart';
 import 'package:manager/views/widgets/MembersWidget.dart';
 import 'package:manager/views/widgets/MyInputfield.dart';
+import 'package:get/get.dart';
+import 'package:manager/controllers/TaskController.dart';
+
+final TaskController _taskController = Get.put(TaskController());
 
 class AddTask extends StatefulWidget {
   const AddTask({super.key});
@@ -40,7 +44,49 @@ class _AddTaskState extends State<AddTask> {
             children: [
               const Spacer(),
               ElevatedButton(
-                  onPressed: () {}, child: Text("Save", style: buttonText))
+                  onPressed: () {
+                    if (_titleController.text.isEmpty) {
+                      Get.snackbar('Error', 'Please enter a title');
+                      return;
+                    }
+
+                    final startDateTime = DateTime(
+                      _selectedDate.year,
+                      _selectedDate.month,
+                      _selectedDate.day,
+                      int.parse(_startTime.split(':')[0]),
+                      int.parse(_startTime.split(':')[1].trim()),
+                    );
+
+                    final endDateTime = DateTime(
+                      _selectedDate.year,
+                      _selectedDate.month,
+                      _selectedDate.day,
+                      int.parse(_endTime.split(':')[0]),
+                      int.parse(_endTime.split(':')[1].trim()),
+                    );
+
+                    _taskController.addTask(
+                      title: _titleController.text,
+                      description: _descriptionController.text,
+                      startTime: startDateTime,
+                      endTime: endDateTime,
+                      color: ['blue', 'yellow', 'red'][_colorIndex - 1],
+                      assignedTo: _selectedMembers,
+                      isRepeat: _isRepeat,
+                      repeatType: _isRepeat ? _selectedOption : '',
+                      repeatDays: _isRepeat && _selectedOption == 'Weekly'
+                          ? _selectedDays
+                              .asMap()
+                              .entries
+                              .where((e) => e.value)
+                              .map((e) => e.key + 1)
+                              .toList()
+                          : [],
+                      repeatUntil: _isRepeat ? _selectedDate.add(const Duration(days: 365)) : null,
+                    );
+                  },
+                  child: Text("Save", style: buttonText))
             ],
           )),
       body: SingleChildScrollView(

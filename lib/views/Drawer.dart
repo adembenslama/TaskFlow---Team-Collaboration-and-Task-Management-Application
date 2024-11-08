@@ -59,7 +59,7 @@ class MyDrawer extends StatelessWidget {
                     isSelected: workspace.uid == 
                         _workspaceController.selectedWorkSpace.value.uid,
                     onTap: () {
-                      _workspaceController.selectedWorkSpace.value = workspace;
+                      _workspaceController.selectWorkspace(workspace);
                       Navigator.pop(context);
                     },
                   ));

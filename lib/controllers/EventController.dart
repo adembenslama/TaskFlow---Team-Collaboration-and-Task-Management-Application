@@ -27,10 +27,8 @@ event fromJsonEvent(QueryDocumentSnapshot json) => event(
     title: json['title'],
     startTime: json['start Time'],
     endTime: json['end Time'],
-    note: json['note'],
     color: json['Color'],
     userUid: json['user'],
     id: json.id,
-    access: json["access"]);
-
+);
 }
