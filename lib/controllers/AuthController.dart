@@ -129,7 +129,45 @@ class AuthController extends GetxController {
   }
 }
 
+  String getUserInitials(String userId) {
+    if (userId == userData.value.uid) {
+      return "${userData.value.firstName[0]}${userData.value.lastName[0]}";
+    }
+    
+    // For other users, fetch from Firestore cache or return default
+    try {
+      final userDoc = _firestore.collection('users').doc(userId).get().then((doc) {
+        if (doc.exists) {
+          final data = doc.data()!;
+          return "${data['firstName'][0]}${data['lastName'][0]}";
+        }
+        return "??";
+      });
+      return userDoc.toString();
+    } catch (e) {
+      return "??";
+    }
+  }
 
+  String getUserName(String userId) {
+    if (userId == userData.value.uid) {
+      return "${userData.value.firstName} ${userData.value.lastName}";
+    }
+    
+    // For other users, fetch from Firestore cache or return default
+    try {
+      final userDoc = _firestore.collection('users').doc(userId).get().then((doc) {
+        if (doc.exists) {
+          final data = doc.data()!;
+          return "${data['firstName']} ${data['lastName']}";
+        }
+        return "Unknown User";
+      });
+      return userDoc.toString();
+    } catch (e) {
+      return "Unknown User";
+    }
+  }
   ////////////////////////////////////////
   void getCurrentUserData() async {
     isLoading(true);

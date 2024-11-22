@@ -50,20 +50,23 @@ class _AddTaskState extends State<AddTask> {
                       return;
                     }
 
+                    final startTime24 = _convertTo24Hour(_startTime);
+                    final endTime24 = _convertTo24Hour(_endTime);
+
                     final startDateTime = DateTime(
                       _selectedDate.year,
                       _selectedDate.month,
                       _selectedDate.day,
-                      int.parse(_startTime.split(':')[0]),
-                      int.parse(_startTime.split(':')[1].trim()),
+                      int.parse(startTime24.split(':')[0]),
+                      int.parse(startTime24.split(':')[1].trim()),
                     );
 
                     final endDateTime = DateTime(
                       _selectedDate.year,
                       _selectedDate.month,
                       _selectedDate.day,
-                      int.parse(_endTime.split(':')[0]),
-                      int.parse(_endTime.split(':')[1].trim()),
+                      int.parse(endTime24.split(':')[0]),
+                      int.parse(endTime24.split(':')[1].trim()),
                     );
 
                     _taskController.addTask(
@@ -449,5 +452,23 @@ class _AddTaskState extends State<AddTask> {
         _endTime = _formattedTime;
       });
     }
+  }
+
+  String _convertTo24Hour(String time12) {
+    final timeParts = time12.split(' ');
+    if (timeParts.length != 2) return time12; // Already 24h format
+    
+    final timeComponents = timeParts[0].split(':');
+    int hours = int.parse(timeComponents[0]);
+    final minutes = timeComponents[1];
+    final meridian = timeParts[1].toUpperCase();
+    
+    if (meridian == 'PM' && hours != 12) {
+      hours += 12;
+    } else if (meridian == 'AM' && hours == 12) {
+      hours = 0;
+    }
+    
+    return '${hours.toString().padLeft(2, '0')}:$minutes';
   }
 }

@@ -21,7 +21,7 @@ class NavigationPage extends StatelessWidget {
     CalendarScreen(),
     const TasksPage(),
     ChannelsPage(),
-    const FeedPage(),
+     FeedPage(),
     ProfilePage(),
   ];
 
