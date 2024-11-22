@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'package:manager/cotroller-bindings.dart';
 import 'package:manager/firebase_options.dart';
 import 'package:manager/theme.dart';
@@ -9,7 +8,6 @@ import 'package:manager/views/Auth/SignUpPage.dart';
 import 'package:get/get.dart';
 import 'package:manager/views/NavPage.dart';
 import 'package:manager/views/tasks/TasksPage.dart';
-import 'package:manager/views/feed/FeedPage.dart';
 import 'package:manager/views/profile/profilePage.dart';
 import 'package:manager/views/chat/ChatPage.dart';
 import 'package:manager/views/schedule/CalendarView.dart';

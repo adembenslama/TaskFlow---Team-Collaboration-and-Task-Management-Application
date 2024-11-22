@@ -452,4 +452,29 @@ bool isEmailVerified() {
       // ... error handling ...
     }
   }
+
+  // Add this property
+  final RxMap<String, UserModel> userCache = <String, UserModel>{}.obs;
+
+  // Replace getUserName with this
+  Future<void> cacheUserData(String userId) async {
+    if (userCache.containsKey(userId)) return;
+    
+    final doc = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(userId)
+        .get();
+    
+    if (doc.exists) {
+      userCache[userId] = UserModel.fromJson(doc);
+    }
+  }
+
+  String getUserNameSync(String userId) {
+    return userCache[userId]?.firstName ?? 'Loading...';
+  }
+
+  String? getUserPhotoSync(String userId) {
+    return userCache[userId]?.pfp;
+  }
 }

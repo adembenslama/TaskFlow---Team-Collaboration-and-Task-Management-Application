@@ -4,6 +4,7 @@ import 'package:iconsax/iconsax.dart';
 import 'package:manager/controllers/FeedController.dart';
 import 'package:manager/theme.dart';
 import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 
 class CreatePostPage extends StatefulWidget {
   const CreatePostPage({super.key});
@@ -98,8 +99,8 @@ class _CreatePostPageState extends State<CreatePostPage> {
                       children: [
                         ClipRRect(
                           borderRadius: BorderRadius.circular(8),
-                          child: Image.network(
-                            _selectedImages[index].path,
+                          child: Image.file(
+                            File(_selectedImages[index].path),
                             fit: BoxFit.cover,
                             width: double.infinity,
                             height: double.infinity,

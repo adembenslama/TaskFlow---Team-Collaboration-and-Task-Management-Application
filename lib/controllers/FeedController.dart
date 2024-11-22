@@ -7,6 +7,7 @@ import 'WorkspaceController.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'dart:io';
+import '../model/notification.dart';
 
 class FeedController extends GetxController {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -159,6 +160,37 @@ class FeedController extends GetxController {
       });
 
       Get.snackbar('Success', 'Comment added successfully');
+
+      // Create notification for post owner
+      final post = posts.firstWhere((p) => p.id == postId);
+      if (replyTo == null) {
+        // New comment notification
+        await createNotification(
+          type: 'comment',
+          userId: post.createdBy,
+          postId: postId,
+          commentId: commentRef.id,
+        );
+      } else {
+        // Reply notification
+        final parentComment = (await _firestore
+            .collection('workspaces')
+            .doc(workspaceId)
+            .collection('posts')
+            .doc(postId)
+            .collection('comments')
+            .doc(replyTo)
+            .get()).data();
+            
+        if (parentComment != null) {
+          await createNotification(
+            type: 'reply',
+            userId: parentComment['createdBy'],
+            postId: postId,
+            commentId: commentRef.id,
+          );
+        }
+      }
     } catch (e) {
       Get.snackbar('Error', 'Failed to add comment');
     }
@@ -224,5 +256,68 @@ class FeedController extends GetxController {
       Get.snackbar('Error', 'Failed to pin/unpin post');
     }
   }
-  
+
+  Future<void> createNotification({
+    required String type,
+    required String userId,
+    required String postId,
+    String? commentId,
+  }) async {
+    try {
+      final workspaceId = _workspaceController.selectedWorkSpace.value.uid;
+      
+      // Don't create notification if user is triggering it for themselves
+      if (userId == _authController.userData.value.uid) return;
+
+      final notificationRef = _firestore
+          .collection('workspaces')
+          .doc(workspaceId)
+          .collection('notifications')
+          .doc();
+
+      final notification = AppNotification(
+        id: notificationRef.id,
+        type: type,
+        userId: userId,
+        triggeredBy: _authController.userData.value.uid,
+        postId: postId,
+        commentId: commentId,
+        createdAt: DateTime.now(),
+      );
+
+      await notificationRef.set(notification.toJson());
+    } catch (e) {
+      print('Error creating notification: $e');
+    }
+  }
+
+  Stream<List<AppNotification>> getNotifications() {
+    final workspaceId = _workspaceController.selectedWorkSpace.value.uid;
+    final userId = _authController.userData.value.uid;
+    
+    return _firestore
+        .collection('workspaces')
+        .doc(workspaceId)
+        .collection('notifications')
+        .where('userId', isEqualTo: userId)
+        .orderBy('createdAt', descending: true)
+        .snapshots()
+        .map((snapshot) => 
+            snapshot.docs.map((doc) => AppNotification.fromJson(doc)).toList());
+  }
+
+  Future<void> markNotificationAsRead(String notificationId) async {
+    try {
+      final workspaceId = _workspaceController.selectedWorkSpace.value.uid;
+      
+      await _firestore
+          .collection('workspaces')
+          .doc(workspaceId)
+          .collection('notifications')
+          .doc(notificationId)
+          .update({'isRead': true});
+    } catch (e) {
+      print('Error marking notification as read: $e');
+    }
+  }
 }
