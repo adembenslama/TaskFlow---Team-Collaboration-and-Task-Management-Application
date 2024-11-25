@@ -9,6 +9,9 @@ class ChatMessage {
   final String type;
   final bool edited;
   final int? editedAt;
+  final String status;
+  final List<String> seenBy;
+  final Map<String, List<String>> reactions;
 
   ChatMessage({
     required this.id,
@@ -19,6 +22,9 @@ class ChatMessage {
     this.type = 'text',
     this.edited = false,
     this.editedAt,
+    this.status = 'sending',
+    this.seenBy = const [],
+    this.reactions = const {},
   });
 
   factory ChatMessage.fromJson(DocumentSnapshot doc) {
@@ -32,6 +38,12 @@ class ChatMessage {
       type: data['type'] ?? 'text',
       edited: data['edited'] ?? false,
       editedAt: data['editedAt']?.millisecondsSinceEpoch,
+      status: data['status'] ?? 'sent',
+      seenBy: List<String>.from(data['seenBy'] ?? []),
+      reactions: Map<String, List<String>>.from(
+        data['reactions']?.map((key, value) => 
+          MapEntry(key, List<String>.from(value ?? []))) ?? {},
+      ),
     );
   }
 
@@ -43,5 +55,8 @@ class ChatMessage {
     'type': type,
     'edited': edited,
     'editedAt': editedAt != null ? Timestamp.fromMillisecondsSinceEpoch(editedAt!) : null,
+    'status': status,
+    'seenBy': seenBy,
+    'reactions': reactions,
   };
 }

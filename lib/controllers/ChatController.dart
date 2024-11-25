@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:manager/controllers/AuthController.dart';
 import 'package:manager/model/chat_message.dart';
@@ -6,10 +7,14 @@ import 'package:manager/model/chat_channel.dart';
 import 'package:manager/views/chat/ChatMessagesPage.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'dart:io';
+import 'package:path_provider/path_provider.dart';
 
 class ChatController extends GetxController {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final AuthController _authController = AuthController.instance;
+  final FirebaseStorage _storage = FirebaseStorage.instance;
 
   RxList<ChatChannel> channels = <ChatChannel>[].obs;
   RxList<ChatMessage> messages = <ChatMessage>[].obs;
@@ -113,9 +118,14 @@ class ChatController extends GetxController {
         timestamp: DateTime.now().millisecondsSinceEpoch,
         replyTo: replyTo,
         type: 'text',
+        status: 'sending',
       );
 
+      // Set initial message
       await messageRef.set(message.toJson());
+
+      // Update status to sent
+      await messageRef.update({'status': 'sent'});
 
       // Send notifications to channel members
       await _sendNotificationToMembers(content);
@@ -217,6 +227,163 @@ class ChatController extends GetxController {
       Get.snackbar('Error', 'Failed to create conversation: $e');
     } finally {
       isLoading(false);
+    }
+  }
+
+  Future<void> sendFileMessage(File file) async {
+    try {
+      if (selectedChannel.value == null) return;
+      
+      final messageRef = _firestore
+          .collection('workspaces')
+          .doc(selectedChannel.value?.workspaceId)
+          .collection('channels')
+          .doc(selectedChannel.value?.id)
+          .collection('messages')
+          .doc();
+
+      // Create initial message with loading state
+      final tempMessage = ChatMessage(
+        id: messageRef.id,
+        content: file.path.split('/').last,
+        senderId: _authController.userData.value.uid,
+        timestamp: DateTime.now().millisecondsSinceEpoch,
+        type: 'file',
+        status: 'sending',
+      );
+      
+      await messageRef.set(tempMessage.toJson());
+
+      // Upload file
+      final fileName = '${DateTime.now().millisecondsSinceEpoch}_${file.path.split('/').last}';
+      final ref = _storage.ref().child('chat_files/$fileName');
+      final uploadTask = ref.putFile(file);
+
+      // Wait for upload to complete
+      final snapshot = await uploadTask.whenComplete(() {});
+      final fileUrl = await snapshot.ref.getDownloadURL();
+
+      // Update message with file URL and status
+      await messageRef.update({
+        'content': fileUrl,
+        'fileName': file.path.split('/').last,
+        'status': 'sent'
+      });
+
+    } catch (e) {
+      Get.snackbar('Error', 'Failed to send file: $e');
+    }
+  }
+
+  // Add method to mark messages as seen
+  Future<void> markMessageAsSeen(String messageId) async {
+    try {
+      if (selectedChannel.value == null) return;
+
+      final messageRef = _firestore
+          .collection('workspaces')
+          .doc(selectedChannel.value?.workspaceId)
+          .collection('channels')
+          .doc(selectedChannel.value?.id)
+          .collection('messages')
+          .doc(messageId);
+
+      await messageRef.update({
+        'seenBy': FieldValue.arrayUnion([_authController.userData.value.uid])
+      });
+    } catch (e) {
+      print('Error marking message as seen: $e');
+    }
+  }
+
+  Future<void> toggleReaction(String messageId, String emoji) async {
+    try {
+      if (selectedChannel.value == null) return;
+
+      final userId = _authController.userData.value.uid;
+      final messageRef = _firestore
+          .collection('workspaces')
+          .doc(selectedChannel.value?.workspaceId)
+          .collection('channels')
+          .doc(selectedChannel.value?.id)
+          .collection('messages')
+          .doc(messageId);
+
+      final message = await messageRef.get();
+      final reactions = Map<String, List<String>>.from(
+        message.data()?['reactions'] ?? {},
+      );
+
+      if (reactions[emoji]?.contains(userId) ?? false) {
+        // Remove reaction
+        reactions[emoji]?.remove(userId);
+        if (reactions[emoji]?.isEmpty ?? false) {
+          reactions.remove(emoji);
+        }
+      } else {
+        // Add reaction
+        if (!reactions.containsKey(emoji)) {
+          reactions[emoji] = [];
+        }
+        reactions[emoji]?.add(userId);
+      }
+
+      await messageRef.update({'reactions': reactions});
+    } catch (e) {
+      print('Error toggling reaction: $e');
+    }
+  }
+
+  Future<String> getUserName(String userId) async {
+    try {
+      final userDoc = await _firestore.collection('users').doc(userId).get();
+      final data = userDoc.data();
+      if (data != null) {
+        return '${data['firstName']} ${data['lastName']}';
+      }
+      return 'Unknown User';
+    } catch (e) {
+      return 'Unknown User';
+    }
+  }
+
+  String getFileType(String fileName) {
+    final extension = fileName.split('.').last.toLowerCase();
+    
+    if (['jpg', 'jpeg', 'png', 'gif'].contains(extension)) {
+      return 'image';
+    } else if (['mp4', 'mov', 'avi'].contains(extension)) {
+      return 'video';
+    } else {
+      return 'document';
+    }
+  }
+
+  Future<void> handleFileClick(String url, String fileName) async {
+    final fileType = getFileType(fileName);
+    
+    switch (fileType) {
+      case 'image':
+        Get.dialog(
+          AlertDialog(
+            content: Image.network(url),
+          ),
+        );
+        break;
+      case 'video':
+        // Implement video player
+        break;
+      default:
+        // Download file
+        try {
+          final response = await http.get(Uri.parse(url));
+          final dir = await getApplicationDocumentsDirectory();
+          final file = File('${dir.path}/$fileName');
+          await file.writeAsBytes(response.bodyBytes);
+          Get.snackbar('Success', 'File downloaded successfully');
+        } catch (e) {
+          Get.snackbar('Error', 'Failed to download file');
+        }
     }
   }
 }
